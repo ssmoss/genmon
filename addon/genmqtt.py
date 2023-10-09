@@ -69,6 +69,8 @@ class MyGenPush(MySupport):
         flush_interval=float("inf"),
         use_numeric=False,
         strlist_json = False,
+        remove_spaces = False,
+        use_rollup_json = False,
         debug=False,
         loglocation=ProgramDefaults.LogPath,
         console=None,
@@ -79,6 +81,8 @@ class MyGenPush(MySupport):
 
         self.UseNumeric = use_numeric
         self.StrListJson = strlist_json
+        self.RemoveSpaces = remove_spaces
+        self.UseRollupJson = use_rollup_json
         self.debug = debug
         self.Exiting = False
 
@@ -234,6 +238,17 @@ class MyGenPush(MySupport):
                     TempDict = json.loads(monitordata)
                     GenmonDict["Monitor"] = TempDict["Monitor"]
                     self.CheckDictForChanges(GenmonDict, "generator")
+
+                    if self.UseRollupJson and self.Callback is not None:
+                        if self.RemoveSpaces:
+                            rollup = json.dumps(
+                                {k.replace(' ', ''): v for k, v in GenmonDict.items()},
+                                sort_keys=False
+                            )
+                        else:
+                            rollup = json.dumps(GenmonDict, sort_keys=False)
+
+                        self.Callback("generator/RollUp", rollup)
 
                 except Exception as e1:
                     self.LogErrorLine("Unable to get status: " + str(e1))
@@ -410,6 +425,9 @@ class MyMQTT(MyCommon):
             self.RemoveSpaces = config.ReadValue(
                 "remove_spaces", return_type=bool, default=False
             )
+            self.UseRollupJson = config.ReadValue(
+                "use_rollup_json", return_type=bool, default=False
+            )
             self.TopicRoot = config.ReadValue("root_topic")
 
             if self.TopicRoot != None:
@@ -533,6 +551,8 @@ class MyMQTT(MyCommon):
                 flush_interval=self.FlushInterval,
                 use_numeric=self.UseNumeric,
                 strlist_json = self.StringListJson,
+                remove_spaces=self.RemoveSpaces,
+                use_rollup_json=self.UseRollupJson,
                 debug=self.debug,
                 port=port,
                 loglocation=loglocation,
