@@ -239,7 +239,9 @@ class MyGenPush(MySupport):
                     GenmonDict["Monitor"] = TempDict["Monitor"]
                     self.CheckDictForChanges(GenmonDict, "generator")
 
+                    # when enabled emit JSON rollup of all data from the GenmonDict
                     if self.UseRollupJson and self.Callback is not None:
+                        # remove spaces from JSON keys
                         if self.RemoveSpaces:
                             rollup = json.dumps(
                                 {k.replace(' ', ''): v for k, v in GenmonDict.items()},
@@ -248,6 +250,7 @@ class MyGenPush(MySupport):
                         else:
                             rollup = json.dumps(GenmonDict, sort_keys=False)
 
+                        # emit rollup under "generator/Rollup topic
                         self.Callback("generator/RollUp", rollup)
 
                 except Exception as e1:
