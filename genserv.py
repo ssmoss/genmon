@@ -1293,6 +1293,15 @@ def GetAddOns():
             bounds="",
             display_name="Remove Spaces in Topic Path",
         )
+        AddOnCfg["genmqtt"]["parameters"]["use_rollup_json"] = CreateAddOnParam(
+            ConfigFiles[GENMQTT_CONFIG].ReadValue(
+                "use_rollup_json", return_type=bool, default=False
+            ),
+            "boolean",
+            "If enabled a single rollup message encoded in JSON will be emitted.",
+            bounds="",
+            display_name="Emit JSON Rollup Message",
+        )
         AddOnCfg["genmqtt"]["parameters"]["cert_authority_path"] = CreateAddOnParam(
             ConfigFiles[GENMQTT_CONFIG].ReadValue(
                 "cert_authority_path", return_type=str, default=""
